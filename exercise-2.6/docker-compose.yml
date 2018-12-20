@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+  proxy:
+    image: nginx
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+  frontend:
+    image: cxcorp/sample-frontend
+    build: ./frontend
+    environment:
+      - API_URL=/api
+    ports:
+      - '5000'
+    depends_on:
+      - backend
+  backend:
+    image: cxcorp/sample-backend
+    build: ./backend
+    environment:
+      - PORT=8000
+      - REDIS=redis
+      - REDIS_PORT=6379
+      - DB_USERNAME=sample_user
+      - DB_PASSWORD=sample_pass
+      - DB_NAME=sample
+      - DB_HOST=database
+      - FRONT_URL=http://frontend:5000
+    ports:
+      - '8000'
+    volumes:
+      - ./backend/logs.txt:/app/logs.txt
+    depends_on:
+      - redis
+      - database
+  redis:
+    image: redis:alpine
+    expose:
+      - '6379'
+    volumes:
+      - redisdata:/data
+    command:
+      - "--appendonly yes"
+  database:
+    image: postgres:alpine
+    expose:
+      - '5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=sample_user
+      - POSTGRES_PASSWORD=sample_pass
+      - POSTGRES_DB=sample
+
+volumes:
+  pgdata:
+  redisdata:
