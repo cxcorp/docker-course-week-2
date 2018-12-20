@@ -1,0 +1,38 @@
+version: '3.5'
+
+services:
+  backend:
+    image: cxcorp/sample-backend
+    build: ./backend
+    environment:
+      - PORT=8000
+      - REDIS=redis
+      - REDIS_PORT=6379
+      - DB_USERNAME=sample_user
+      - DB_PASSWORD=sample_pass
+      - DB_NAME=sample
+      - DB_HOST=database
+      - FRONT_URL=http://localhost:3000
+    ports:
+      - 3001:8000
+    volumes:
+      - ./backend/logs.txt:/app/logs.txt
+  frontend:
+    image: cxcorp/sample-frontend
+    build: ./frontend
+    environment:
+      - API_URL=http://localhost:3001
+    ports:
+      - 3000:5000
+  redis:
+    image: redis:alpine
+    expose:
+      - 6379
+  database:
+    image: postgres:alpine
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=sample_user
+      - POSTGRES_PASSWORD=sample_pass
+      - POSTGRES_DB=sample
