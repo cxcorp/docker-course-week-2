@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  training:
+    image: cxcorp/ml-kurkkumopo-training
+    build: ./ml-kurkkumopo-training
+    volumes:
+      - models:/src/model
+      - model_images:/src/imgs
+  backend:
+    image: cxcorp/ml-kurkkumopo-backend
+    build: ./ml-kurkkumopo-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - ENV=production
+    volumes:
+      - models:/src/model
+    depends_on:
+      - training
+  frontend:
+    image: cxcorp/ml-kurkkumopo-frontend
+    build: ./ml-kurkkumopo-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  models:
+  model_images:
