@@ -1,0 +1,20 @@
+version: '3.5'
+
+services:
+  backend:
+    image: cxcorp/sample-backend
+    build: ./backend
+    environment:
+      - PORT=8000
+      - FRONT_URL=http://localhost:3000
+    ports:
+      - 3001:8000
+    volumes:
+      - ./backend/logs.txt:/app/logs.txt
+  frontend:
+    image: cxcorp/sample-frontend
+    build: ./frontend
+    environment:
+      - API_URL=http://localhost:3001
+    ports:
+      - 3000:5000
